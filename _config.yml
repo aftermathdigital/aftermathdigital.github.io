@@ -7,7 +7,7 @@ baseurl:     ""
 url:         ""
 header_pages:
  - about.md
- - contact.html
+ - defi.md
 
 # Google services
 google_verification:
