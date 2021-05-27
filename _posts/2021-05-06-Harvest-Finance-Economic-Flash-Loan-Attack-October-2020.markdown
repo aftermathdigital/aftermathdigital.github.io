@@ -3,7 +3,7 @@ layout:		post
 title:		Technical Details of the Harvest Finance Flash Loan Attack	
 date:		2021-05-26 12:00:00
 summary:	A deep-dive into the economic exploit that hit Harvest Finance in October 2020.
-categories:	jekyll pixyll
+categories:	exploit
 ---
 In October 2020, Harvest Finance was hit by a large-scale economic attack, involving a flash loan and a pool-price-manipulation.
 
