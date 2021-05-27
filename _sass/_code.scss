@@ -2,6 +2,7 @@ pre,
 pre code {
   background-color: transparent;
   border-radius: $pre-border-radius;
+  font-size: 14px;
 }
 
 pre,
@@ -22,7 +23,6 @@ pre {
 }
 
 .highlight .p {
-  font-size: 1.125rem;
   line-height: 1;
 }
 
