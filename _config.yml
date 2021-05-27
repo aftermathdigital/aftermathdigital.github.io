@@ -1,11 +1,10 @@
 # Site settings
-title:       Pixyll
-email:       your_email@example.com
-author:      John Otander
-description: "A simple, beautiful theme for Jekyll that emphasizes content rather than aesthetic fluff."
+title:       Aftermath.digital
+email:       aftermath.digital0@gmail.com
+author:      Aftermath
+description: "Exploring the aftermath of exploits and manipulation in decentralized-finance"
 baseurl:     ""
-url:         "https://pixyll.com"
-date_format: "%b %-d, %Y"
+url:         ""
 header_pages:
  - about.md
  - contact.html
