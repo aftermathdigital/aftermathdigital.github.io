@@ -69,7 +69,6 @@ contract Ballot {
     /// Give $(toVoter) the right to vote on this ballot.
     /// May only be called by $(chairperson).
     function register(address toVoter) public validStage(Stage.Reg) onlyBy(chairperson) {
-        require(stage == Stage.Reg);
         if (msg.sender != chairperson || voters[toVoter].voted) return;
         voters[toVoter].weight = 1;
         voters[toVoter].voted = false;
@@ -77,22 +76,21 @@ contract Ballot {
     }
     /// Give a single vote to proposal $(toProposal).
     function vote(uint8 toProposal) public validStage(Stage.Vote)  {
-        require(stage == Stage.Vote);
         Voter storage sender = voters[msg.sender];
         if (sender.voted || toProposal >= proposals.length) return;
         sender.voted = true;
         sender.vote = toProposal;   
         proposals[toProposal].voteCount += sender.weight;
-        if (block.timestamp > (startTime+ 30 seconds)) {stage = Stage.Done; emit votingCompleted();}         
+        if (block.timestamp > (startTime+ 60 seconds)) {stage = Stage.Done; emit votingCompleted();}         
     }
     function winningProposal() public validStage(Stage.Done) view returns (uint8 _winningProposal) {
-        require(stage == Stage.Done);
         uint256 winningVoteCount = 0;
-        for (uint8 prop = 0; prop < proposals.length; prop++)
+        for (uint8 prop = 0; prop < proposals.length; prop++) {
             if (proposals[prop].voteCount > winningVoteCount) {
                 winningVoteCount = proposals[prop].voteCount;
                 _winningProposal = prop;
             }
+       }
        assert (winningVoteCount > 0);
     }
 }
@@ -100,22 +98,13 @@ contract Ballot {
 
 The API is pretty simple, we have:
 
-- ```c
-  constructor(uint8 _numProposals)
-  ```
+- constructor(uint8 _numProposals)
 
-- ```c
-  function register(address toVoter) public validStage(Stage.Reg) onlyBy(chairperson)
-  ```
+- function register(address toVoter) public validStage(Stage.Reg) onlyBy(chairperson)
 
-- ```c
-  function vote(uint8 toProposal) public validStage(Stage.Vote)
-  ```
+- function vote(uint8 toProposal) public validStage(Stage.Vote)
 
-- ```c
-  function winningProposal() public validStage(Stage.Done) view returns (uint8 _winningProposal)
-  ```
-
+- function winningProposal() public validStage(Stage.Done) view returns (uint8 _winningProposal)
 
 
 And the client interaction might look like this:
@@ -282,6 +271,7 @@ Taking all of this into account, let's take a look at our ballot contracts now:
 
 ```c
 //TransparentProxy.sol
+//"SPDX-License-Identifier: UNLICENSED"
 pragma solidity ^0.8.0;
 contract TransparentProxy {
     struct Voter {
@@ -293,7 +283,7 @@ contract TransparentProxy {
         uint voteCount;
     }
     enum Stage {Init,Reg, Vote, Done}
-    
+
     //Variables, defined in exactly the same way as in the logic contract.
     Stage public stage = Stage.Init;
     address chairperson;
@@ -310,31 +300,31 @@ contract TransparentProxy {
     struct _addressSlot {
         address value;
     }
-    
+
     //isOwner modifier, prevents anyone other than owner from upgrading contract implementation
     modifier isOwner() {
         require(msg.sender == getAddressSlot(_ADMIN_SLOT).value);
         _;
     }
- 
+
     //Constructor, sets admin slot to msg.sender
     constructor(address _implementation){
         getAddressSlot(_ADMIN_SLOT).value = msg.sender;
         upgradeLogic(_implementation);
     }
-    
+
     //get an address from a slot
     function getAddressSlot(bytes32 slot) internal pure returns (_addressSlot storage r) {
         assembly {
             r.slot := slot
         }
     }
-    
+
     //overwrite the implementation slot, isOwner only.
     function upgradeLogic(address _newImplementation) isOwner public {
         getAddressSlot(_IMPLEMENTATION_SLOT).value = _newImplementation;
     }
-    
+
     fallback() external {
         address implementation = getAddressSlot(_IMPLEMENTATION_SLOT).value;
         assembly {
@@ -353,6 +343,7 @@ And:
 
 ```c
 //Ballot.sol
+//"SPDX-License-Identifier: UNLICENSED"
 pragma solidity ^0.8.0;
 contract Ballot {
     struct Voter {
@@ -364,8 +355,8 @@ contract Ballot {
     struct Proposal {
         uint voteCount;
     }
-    enum Stage {Init, Reg, Vote, Done}
-    
+    enum Stage {Init,Reg, Vote, Done}
+
     //Variables, defined in exactly the same way as in the logic contract.
     Stage public stage = Stage.Init;
     address chairperson;
@@ -376,16 +367,16 @@ contract Ballot {
     //End variables
 
     event votingCompleted();
-    
+
     //modifiers
     modifier validStage(Stage reqStage)
-    { require(stage == reqStage);
+    { require(stage == reqStage, "Wrong stage");
       _;
     }
 
     modifier onlyBy(address _account)
     {
-        require(msg.sender == _account);
+        require(msg.sender == _account, "Only chairperson can register voters");
         _;
     }
 
@@ -395,7 +386,7 @@ contract Ballot {
 
     /// Create a new ballot with $(_numProposals) different proposals.
     function initialize(uint8 _numProposals) public {
-        require(chairperson == address(0x0)); //prevent re-initialization
+        require(chairperson == address(0x0), "Cannot re-initialize contract"); //prevent re-initialization
         chairperson = msg.sender;
         voters[chairperson].weight = 2;
         for(uint i = 0; i < _numProposals; i++){
@@ -408,36 +399,43 @@ contract Ballot {
     /// Give $(toVoter) the right to vote on this ballot.
     /// May only be called by $(chairperson).
     function register(address toVoter) public validStage(Stage.Reg) onlyBy(chairperson) {
-        require(stage == Stage.Reg);
         if (msg.sender != chairperson || voters[toVoter].voted) return;
         voters[toVoter].weight = 1;
         voters[toVoter].voted = false;
-        if (block.timestamp > (startTime+ 30 seconds)) {stage = Stage.Vote; }        
+        if (block.timestamp > (startTime+ 30 seconds)) {
+            stage = Stage.Vote;
+            startTime = block.timestamp;
+        }
     }
     /// Give a single vote to proposal $(toProposal).
     function vote(uint8 toProposal) public validStage(Stage.Vote)  {
-        require(stage == Stage.Vote);
         sender = voters[msg.sender];
-        if (sender.voted || toProposal >= proposals.length) return;
+        require(!sender.voted, "Can't vote twice");
+        require(toProposal < proposals.length, "Can't vote twice");
+        require(sender.weight > 0, "Only registered voters can vote");
         sender.voted = true;
-        sender.vote = toProposal;   
+        sender.vote = toProposal;
         proposals[toProposal].voteCount += sender.weight;
-        if (block.timestamp > (startTime+ 30 seconds)) {stage = Stage.Done; emit votingCompleted();}        
-        
+        if (block.timestamp > (startTime+ 30 seconds)) {
+            stage = Stage.Done;
+            startTime = block.timestamp;
+            emit votingCompleted();
+        }
+
     }
 
     function winningProposal() public validStage(Stage.Done) view returns (uint8 _winningProposal) {
-        require(stage == Stage.Done);
         uint256 winningVoteCount = 0;
-        for (uint8 prop = 0; prop < proposals.length; prop++)
+        for (uint8 prop = 0; prop < proposals.length; prop++) {
             if (proposals[prop].voteCount > winningVoteCount) {
                 winningVoteCount = proposals[prop].voteCount;
                 _winningProposal = prop;
             }
-       assert (winningVoteCount > 0);
-
+	}
+        assert (winningVoteCount > 0);
     }
 }
+
 ```
 
 Now, our client interaction looks like this:

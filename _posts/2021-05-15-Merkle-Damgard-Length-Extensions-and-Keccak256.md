@@ -52,5 +52,7 @@ Instead of a MD construction, Keccak256 uses what's called a [Sponge function](h
 
 ![md_hash_algo](/images/sponge_reconstruction.png)
 
+Note that I'm using 2 registers to represent some known state and some unknown state; real sponge algorithms (like Keccak) may use more.
+
 At a high-level, that's how Keccak differs from previous MD construction, and how it mitigates hash length extension.
 
