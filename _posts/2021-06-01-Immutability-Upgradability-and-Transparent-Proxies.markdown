@@ -132,7 +132,7 @@ But what if disaster strikes, and all of a sudden, vast swathes of humanity lose
 
 It would be reasonable for the chairperson to want to extend the voting period - but they can't. This contract's logic is fixed on the blockchain, and much of humanity will never get their chance to influence this vote.
 
-This is (albeit a somewhat contrived) example of where upgrading the logic of a smart contract might be desirable.
+This is an (albeit a somewhat contrived) example of where upgrading the logic of a smart contract might be desirable.
 
 ## Proxy Contracts
 
