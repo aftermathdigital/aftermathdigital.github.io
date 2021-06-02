@@ -1,7 +1,7 @@
 ---
 layout:		post
 title:		Technical Details of the Harvest Finance Flash Loan Attack	
-date:		2021-05-26 12:00:00
+date:		2021-05-06 12:00:00
 summary:	A deep-dive into the economic exploit that hit Harvest Finance in October 2020.
 categories:	exploit
 ---
