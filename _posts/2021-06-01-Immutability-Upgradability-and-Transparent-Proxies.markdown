@@ -150,7 +150,7 @@ All of a sudden, we've introduced mutable logic to our immutable infrastructure 
 
 This looks great at first, but as mentioned - we've actually invalidated one of the innovations we highlighted earlier. The logic of our contract can now be subject to change. There are strategies which try and mitigate the counterparty risk in this case, such as time-locks, but the truth is that there's rarely a free lunch, and we have indeed lost the promise of immutability.
 
-There are a variety of architectures which can solve this problem - of differing complexity to meet a requirement of needs. OpenZeppelin provides a detailed comparison of the ones they offer [here](https://blog.openzeppelin.com/proxy-patterns/). **Any production contract should use a production quality contract, such as one of the ones offered by OpenZeppelin.** To keep this post short - I'm going to propose a very simple contract which will demonstrate the key ideas.
+There are a variety of architectures which can solve this problem - of differing complexity to meet a requirement of needs. OpenZeppelin provides a detailed comparison of the ones they offer [here](https://blog.openzeppelin.com/proxy-patterns/). **Any production contract should use a production quality proxy contract, such as one of the ones offered by OpenZeppelin.** To keep this post short - I'm going to propose a very simple contract which will demonstrate the key ideas.
 
 So we now have a pair of contracts - one which contains our business logic, and one which contains our storage (or our 'state'). How might the logic contract go about using the state in the proxy contract?
 
