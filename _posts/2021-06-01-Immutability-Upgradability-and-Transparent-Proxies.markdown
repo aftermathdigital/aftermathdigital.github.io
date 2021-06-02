@@ -460,7 +460,7 @@ The astute reader will have noticed an additional check in the initializer:
 require(chairperson == address(0x0)); //prevent re-initialization
 ```
 
-Initializers are not like constructors, they are written to the blockchain, so they can be called time and time again, unlike constructors - so **it is important to prevent your contract being re-initialized by a malicious third party**. This might sound obvious, but it's happened.
+Initializers are not like constructors, they are written to the blockchain and can be called time and time again, which constructors cannot. **It is important to prevent your contract being re-initialized by a malicious third party**. This might sound obvious, but it's happened.
 
 [ValueDefi](https://valuedefi.io/) was hit when their initializer function [failed to record that it had been initialized](https://medium.com/valuedefi/vstake-pool-incident-post-mortem-4550407c9714). This one-line mistake cost ValueDefi 205,659.22 BUSD and 8790.77 BNB, a costly mistake indeed.
 
