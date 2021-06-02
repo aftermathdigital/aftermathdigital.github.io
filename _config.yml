@@ -7,7 +7,6 @@ baseurl:     ""
 url:         ""
 header_pages:
  - about.md
- - defi.md
 
 # Google services
 google_verification:
