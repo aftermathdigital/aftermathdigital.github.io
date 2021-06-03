@@ -40,7 +40,7 @@ If we can re-create the internal state of the hashing algorithm, we can pickup r
 
 Because an attacker who intercepts and forwards the message doesn't need to know the pre-shared-key in order to append data to the message. This pattern of message signing was exploited in [2009 to break the Flickr API](http://netifera.com/research/flickr_api_signature_forgery.pdf). It's a great case-study, because the cryptographic primitives worked exactly as intended, they were just misused in a way that didn't provide the protection the developer they thought they were getting.
 
-This GitHub repo, which borrows heavily from [this gist](https://gist.github.com/prokls/41e82472bd4968720d1482f81235e0ac), demonstrates an MD length extension attack. The hash is manually loaded into the registers of the hashing algorithm's state, and more text is appended to the hash, which is then forwarded along with the original message. No complicated mathematics required.
+[This GitHub repo](https://github.com/aftermathdigital/SHA256LengthExtension), which borrows heavily from [this gist](https://gist.github.com/prokls/41e82472bd4968720d1482f81235e0ac), demonstrates an MD length extension attack. The hash is manually loaded into the registers of the hashing algorithm's state, and more text is appended to the hash, which is then forwarded along with the original message. No complicated mathematics required. The only caveat is that the length of the pre-shared-key needs to be known in order to forge the signature - but it's usually trivially brute-forcable, as demonstrated in the [repo](https://github.com/aftermathdigital/SHA256LengthExtension).
 
 So how is Keccak256 resistant to this kind of attack?
 
@@ -54,5 +54,5 @@ Instead of a MD construction, Keccak256 uses what's called a [Sponge function](h
 
 Note that I'm using 2 registers to represent some known state and some unknown state; real sponge algorithms (like Keccak) may use more.
 
-At a high-level, that's how Keccak differs from previous MD construction, and how it mitigates hash length extension.
+At a very high-level, that's one of the ways Keccak's sponge construction differs from previous MD construction, and how it mitigates hash length extension.
 
