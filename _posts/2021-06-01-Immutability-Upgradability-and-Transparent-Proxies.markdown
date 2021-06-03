@@ -96,6 +96,10 @@ contract Ballot {
 }
 ```
 
+This is one of the sample contracts from [Remix](https://remix.ethereum.org), with a couple of modifications.
+
+It's made some questionable design decisions, such as the logic to progress the `stage` state, but we won't worry about those in this post.
+
 The API is pretty simple, we have:
 
 - constructor(uint8 _numProposals)
