@@ -29,7 +29,9 @@ The seller later deposits the 51,456,280.788906 fUSDC and receives 50,298,684.21
 
 What's going on? Depositing 49.977 million USDC and immediately withdrawing 51.456 million USDC? Let's work it out.
 
-Beneath the hood, this contract uses the curve.fi yPool - a multi-asset stablecoin pool where users can deposit DAI, USDT, USDC, or TUSD in exchange for yDAI, yUSDT, yUSDC, or yTUSD, which earn interest as the underlying token is used to provide liquidity to curve's AMM. In this case, Harvest Finance were using the yAsset tokens to purchase yCRV, which they could further invest in order to maximize yield.
+Beneath the hood, this contract uses the curve.fi yPool - a multi-asset stablecoin pool where users can deposit DAI, USDT, USDC, or TUSD in exchange for yCRV. It's worth noting that when depositing one of the stablecoin assets, they are initially wrapped in a token called yAsset, which is then traded for yCRV under the hood. One of the rewards for holding yCRV is CRV, the native governance token of Curve.fi. This CRV reward can be sold to purchase yet more yCRV, resulting in compounded yield - this is the function of Harvest Finance.
+
+I'll use 'underlying asset' and 'USDC' interchangable here, since they are one and the same in this instance; but underlying asset could have been any of the stablecoins accepted in the yPool if Harvest Finance had had vaults for those stablecoins.
 
 ### Depositing USDC
 
@@ -75,7 +77,7 @@ function depositArbCheck() public view returns(bool) {
   }
 }
 ```
-The purpose of this function is to check that the deviation in the price difference of yCRV and an underlying yAsset is less than at some known '`checkpoint`'. As it happens, the `arbTolerence` in this instance was set at three percent, a value far too high to protect the contract when it has enough liquidity to support millions of dollars of transacting without causing more than the pre-set three percent deviation. So this check can be passed, as it is overly permissive - however it's worth noting that a price deviation of three percent from the last checkpoint will cause the transaction to be reverted.
+The purpose of this function is to check that the deviation in the price difference of yCRV and an underlying asset is less than at some known '`checkpoint`'. As it happens, the `arbTolerence` in this instance was set at three percent, a value far too high to protect the contract when it has enough liquidity to support millions of dollars of transacting without causing more than the pre-set three percent deviation. So this check can be passed, as it is overly permissive - however it's worth noting that a price deviation of three percent from the last checkpoint will cause the transaction to be reverted.
 
 There's another critical function lurking in this check, which we can't skip over: `underlyingValueFromYCrv`
 
@@ -88,7 +90,7 @@ function underlyingValueFromYCrv(uint256 ycrvBalance) public view returns (uint2
 }
 ```
 
-This function is responsible for getting the current market rate of yCRV to yAsset. It's worth noting that one of the ways the yCRV pool maintains the correct ratio of yAssets is through arbitrage opportunities between yCRV and the underlying yAssets when the ratios of those yAssets deviate.
+This function is responsible for getting the current market rate of yCRV to yAsset. It's worth knowing that one of the ways the yPool maintains the correct ratio of yAssets is through arbitrage opportunities between yCRV and the underlying yAssets when the ratios of those yAssets deviate. As mentioned before, the asset you deposit is briefly converted into yAsset before being traded for yCRV.
 
 Returning to the `_deposit` function, we now understand that the line `require(strategy.depositArbCheck(), "Too much arb");` is well intentioned, but needs to be using a much lower `arbTolerance` given the massive amount of liquidity in this pool, possibly with more frequent checkpoints.
 
@@ -123,7 +125,7 @@ It's made up of two variables:
 
 The former just returns the amount of underlying USDC ERC20 owned by this contract.
 
-The latter has to query the underlying strategy and gauge the equivalent underlying value of whatever is locked up in the strategy - or the USDC value of the yCRVthe strategy is farming.
+The latter has to query the underlying strategy and gauge the equivalent underlying value of whatever is locked up in the strategy - or the USDC value of the yCRV the strategy is farming.
 
 Do you see where this is headed?
 
@@ -237,7 +239,7 @@ def _calc_withdraw_one_coin(_token_amount: uint256, i: int128, rates: uint256[N_
 
     return dy
 ```
-I'm not going to dig through the maths of this contract - what it is is a Curve.fi contract calculating how much yAsset can be purchased by a single yCRV token, in the current pool.
+I'm not going to dig through the maths of this contract - what it is is a Curve.fi contract calculating how much yAsset can be purchased by a single yCRV token in the yPool.
 
 **This is an absolute show-stopper.**
 
@@ -247,13 +249,13 @@ By creating a price imbalance between a yAsset and yCRV (say... through a flash-
 
 Let's say we're market manipulator dealing with yUSDC
 
-1. We trade a massive yUSDC for yOtherAsset in the pool
+1. We trade a massive USDC for some other stablecoin in the pool
 2. This drives down the price of yUSDC
-3.  We come by and deposit large amounts of USDC into the fUSDC vault
-4. The term `underlyingBalanceWithInvestment()`  in the calculation `amount.mul(totalSupply()).div(underlyingBalanceWithInvestment());` reduced
-5. Resulting in a larger value in toMint than we'd otherwise be entitled to.
+3. We come by and deposit large amounts of USDC into the fUSDC vault
+4. The term `underlyingBalanceWithInvestment()` in the calculation `amount.mul(totalSupply()).div(underlyingBalanceWithInvestment());` is reduced
+5. This results in a larger value in toMint than we'd otherwise be entitled to, hence we mint more fUSDC.
 
-But how does this result in profit when we go-on to withdraw from the pool?
+But how does this result in profit when we go on to withdraw from the pool?
 
 ### Withdrawing USDC
 
@@ -300,7 +302,7 @@ uint256 underlyingAmountToWithdraw = underlyingBalanceWithInvestment()
 
 Is once again relying on the underlying value of yCRV with respect to the yAsset in the yPool
 
-By reversing the price change created by selling a large sum of yUSDC in the pool, this maximises the `underlyingBalanceWithInvestment()`, increasing the `underlyingAmountToWithdraw`
+By reversing the price change created by selling a large sum of yUSDC in the pool, this maximises the `underlyingBalanceWithInvestment()`, increasing the `underlyingAmountToWithdraw`. Now when we trade in our fUSDC, we'll be getting more USDC than we'd deposited in the first-place, which will enable us to drain the vault.
 
 ### Demonstration
 
