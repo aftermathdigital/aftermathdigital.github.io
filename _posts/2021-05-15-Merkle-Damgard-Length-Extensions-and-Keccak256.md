@@ -19,7 +19,7 @@ Examples of Merkle-Damgård hashes include:
 - SHA-2
 - MD5
 
-Merkle-Damgård (MD, henceforth) hashing algorithms can be visualized as a collection of register-states, along with a function which transition's those states into a new set of register states, like so:
+Merkle-Damgård (MD, henceforth) hashing algorithms can be visualized as a collection of register-states, along with a function which transitions those states into a new set of register states, like so:
 
 ![md_hash_algo](/images/md_hash_algo.png)
 
