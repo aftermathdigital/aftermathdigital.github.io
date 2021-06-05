@@ -29,13 +29,13 @@ The seller later deposits the 51,456,280.788906 fUSDC and receives 50,298,684.21
 
 What's going on? Depositing 49.977 million USDC and immediately withdrawing 51.456 million USDC? Let's work it out.
 
-Beneath the hood, this contract uses the curve.fi yPool - a multi-asset stablecoin pool where users can deposit DAI, USDT, USDC, or TUSD in exchange for yCRV. It's worth noting that when depositing one of the stablecoin assets, they are initially wrapped in a token called yAsset, which is then traded for yCRV under the hood. One of the rewards for holding yCRV is CRV, the native governance token of Curve.fi. This CRV reward can be sold to purchase yet more yCRV, resulting in compounded yield - this is the function of Harvest Finance.
+Beneath the hood, this contract uses the Curve.fi yPool - a multi-asset stablecoin pool where users can deposit DAI, USDT, USDC, or TUSD in exchange for yCRV. It's worth noting that when depositing one of the stablecoin assets, they are initially wrapped in a token called yAsset (where asset might be DAI, USDT, USDC, or TUSD), which is then traded for yCRV under the hood. One of the rewards for holding yCRV is CRV, the native governance token of Curve.fi. This CRV reward can be sold to purchase yet more yCRV, resulting in compound yield - this is the function of Harvest Finance.
 
-I'll use 'underlying asset' and 'USDC' interchangable here, since they are one and the same in this instance; but underlying asset could have been any of the stablecoins accepted in the yPool if Harvest Finance had had vaults for those stablecoins.
+I'll use 'underlying asset' and 'USDC' interchangable here, since they are one and the same in this instance; but underlying asset could have been any of the stablecoins accepted in the yPool, provided Harvest Finance offered a vault for that asset.
 
 ### Depositing USDC
 
-Some underlying asset (USDC) is sent to the VaultProxy, and the `deposit` function of the VaultYCRV function is `delegatecall`ed, which wraps the following `_deposit` function:
+Some USDC is sent to the VaultProxy, and the `deposit` function of the VaultYCRV function is `delegatecall`ed, which wraps the following `_deposit` function:
 
 ```c
 function _deposit(uint256 amount, address sender, address beneficiary) internal{
@@ -90,7 +90,7 @@ function underlyingValueFromYCrv(uint256 ycrvBalance) public view returns (uint2
 }
 ```
 
-This function is responsible for getting the current market rate of yCRV to yAsset. It's worth knowing that one of the ways the yPool maintains the correct ratio of yAssets is through arbitrage opportunities between yCRV and the underlying yAssets when the ratios of those yAssets deviate. As mentioned before, the asset you deposit is briefly converted into yAsset before being traded for yCRV.
+This function is responsible for getting the current market rate of yCRV to yAsset. One of the ways the yPool maintains the correct ratio of yAssets is through arbitrage opportunities between yCRV and the underlying yAssets when the ratios of those yAssets deviate. As mentioned before, the asset you deposit is briefly converted into yAsset before being traded for yCRV.
 
 Returning to the `_deposit` function, we now understand that the line `require(strategy.depositArbCheck(), "Too much arb");` is well intentioned, but needs to be using a much lower `arbTolerance` given the massive amount of liquidity in this pool, possibly with more frequent checkpoints.
 
