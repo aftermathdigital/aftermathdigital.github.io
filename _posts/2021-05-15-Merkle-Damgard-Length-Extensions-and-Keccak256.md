@@ -19,7 +19,7 @@ Examples of Merkle-Damgård hashes include:
 - SHA-2
 - MD5
 
-Merkle-Damgård (MD, henceforth) hashing algorithms can be visualized as a collection of register-states, along with a function which transition's those states into a new set of register states, like so:
+Merkle-Damgård (MD, henceforth) hashing algorithms can be visualized as a collection of register-states, along with a function which transitions those states into a new set of register states, like so:
 
 ![md_hash_algo](/images/md_hash_algo.png)
 
@@ -38,7 +38,7 @@ If we can re-create the internal state of the hashing algorithm, we can pickup r
 
 ![md_hash_algo](/images/signed_message.png)
 
-Because an attacker who intercepts and forwards the message doesn't need to know the pre-shared-key in order to append data to the message. This pattern of message signing was exploited in [2009 to break the Flickr API](http://netifera.com/research/flickr_api_signature_forgery.pdf). It's a great case-study, because the cryptographic primitives worked exactly as intended, they were just misused in a way that didn't provide the protection the developer they thought they were getting.
+Because an attacker who intercepts and forwards the message doesn't need to know the pre-shared-key in order to append data to the message. This pattern of message signing was exploited in [2009 to break the Flickr API](http://netifera.com/research/flickr_api_signature_forgery.pdf). It's a great case-study, because the cryptographic primitives worked exactly as intended, they were just used in a way that didn't provide the protection the developer thought they were getting.
 
 [This GitHub repo](https://github.com/aftermathdigital/SHA256LengthExtension), which borrows heavily from [this gist](https://gist.github.com/prokls/41e82472bd4968720d1482f81235e0ac), demonstrates an MD length extension attack. The hash is manually loaded into the registers of the hashing algorithm's state, and more text is appended to the hash, which is then forwarded along with the original message. No complicated mathematics required. The only caveat is that the length of the pre-shared-key needs to be known in order to forge the signature - but it's usually trivially brute-forcable, as demonstrated in the [repo](https://github.com/aftermathdigital/SHA256LengthExtension).
 
