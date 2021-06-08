@@ -147,11 +147,11 @@ There are a variety of architectures which can solve this problem - of differing
 
 So we now have a pair of contracts - one which contains our business logic, and one which contains our storage (or our 'state'). How might the logic contract go about using the state in the proxy contract?
 
-To answer that question, we're going to have to understand the `deligatecall` functionality offered by solidity, and how storage slots work.
+To answer that question, we're going to have to understand the `delegatecall` functionality offered by solidity, and how storage slots work.
 
-## Deligatecall
+## Delegatecall
 
-`deligatecall` is an EVM instruction (and built-in function) which allows one contract to call a function in another, whilst maintaining its own context as the execution context. For traditional Object-Oriented programmers - this is not dissimilar to calling a static function, passing in your own `'this'` pointer.
+`delegatecall` is an EVM instruction (and built-in function) which allows one contract to call a function in another, whilst maintaining its own context as the execution context. For traditional Object-Oriented programmers - this is not dissimilar to calling a static function, passing in your own `'this'` pointer.
 
 There's a slight problem with the `delegatecall` built-in versus the `delegatecall` instruction.
 
