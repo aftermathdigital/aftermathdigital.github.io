@@ -14,3 +14,5 @@ This blog is here to document some of the big attacks we see in DeFi, at a lower
 I'll be looking at the high-level exploit, and breaking it down at the source or EVM level. I'll be documenting logic errors, architectural vulnerabilities, low-level EVM misuse, and misplaced trust.
 
 I'll also be considering some of the patterns which have been developed to protect smart-contracts from exploitation or manipulation, highlighting their drawbacks, and how they might be misused.
+
+Follow me for updates on [twitter](https://twitter.com/aftermathdigit)
