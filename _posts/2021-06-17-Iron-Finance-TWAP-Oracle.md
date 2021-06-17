@@ -6,7 +6,7 @@ summary:        A first-look at the vulnerability which drove IRON-Finance's TIT
 categories:     exploit
 ---
 
-If you're reading this blog, you've probably heard of flash-loan attacks. If not, here's an example of one in action.
+If you're reading this blog, you've probably heard of flash-loan attacks. If not, [here's](https://aftermath.digital/exploit/2021/05/06/Harvest-Finance-Economic-Flash-Loan-Attack-October-2020/) an example of one in action.
 
  **tldr**; a flash loan allows a contract to make a totally uncollateralized loan as long as that loan is paid back with a fee in the same transaction - relaxing the rules on collateral enables flash loans to be truly massive. These massive loans are then use to manipulate prices which enable further economic exploitation.
 
