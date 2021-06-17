@@ -10,9 +10,9 @@ If you're reading this blog, you've probably heard of flash-loan attacks. If not
 
  **tldr**; a flash loan allows a contract to make a totally uncollateralized loan as long as that loan is paid back with a fee in the same transaction - relaxing the rules on collateral enables flash loans to be truly massive. These massive loans are then use to manipulate prices which enable further economic exploitation.
 
-Iron-Finance was recently exploited in such a way that their [TITAN](https://www.coingecko.com/en/coins/iron-titanium-token) token went to zero in a matter of hours. I believe the exploit took advantage of a **mitigation** which was put in place to prevent flash-loan attacks, a Time-Weighted-Average-Price (**TWAP**) oracle.
+Iron-Finance was recently exploited in such a way that their [TITAN](https://www.coingecko.com/en/coins/iron-titanium-token) token went to zero in a matter of hours. I believe the exploit took advantage of a **mitigation** which was put in place to prevent flash-loan attacks, a Time-Weighted-Average-Price (**TWAP**) oracle. This design flaw made it possible for arbitrageurs to mint excessive amounts of TITAN, which they then dumped on the market.
 
-In this post, I'm not going to discuss the exact details of the IRON vulnerability, I hope to do that in a future post when the dust has settled and I've had the time to do a full assessment of the vulnerability.
+In this post, I'm not going to discuss the low-level details of the IRON vulnerability, I hope to do that in a future post when the dust has settled and I've had the time to do a full assessment of the vulnerability.
 
 ### What is a TWAP Oracle?
 
@@ -66,17 +66,14 @@ Depending on the business logic of our contract, that could be a really big deal
 
 In the case of IRON-Finance, it was.
 
-At this point in time, I believe someone (most likely multiple people) abused the price discrepancy reported by a TWAP oracle in order to mint excessive amounts of TITAN, which was then dumped on the market, driving the price to zero over a matter of hours:
+It would appear that these circumstances led to a situation in which it was possible to redeem IRON for more than its market value in USDC and TITAN. That TITAN was then dumped on the market, driving the price down further. As the price plummeted more and more, the IRON-Finance TWAP oracle was never able to catch-up, and this cyclic opportunitiy for arbitrage existed for long enough to drive the price of TITAN to zero.
 
 ![titan_price_chart](/images/titan_chart.png)
 
 ## Conclusion
 
-In computer-science, there's very rarely a free lunch. Algorithmic changes which give you certain properties you want often give you other properties you hadn't anticipated, which you didn't want. This is an instance of just such a property.
+In computer-science, there's very rarely a free lunch. Algorithmic changes which give you certain properties you want often give you other properties you hadn't anticipated, which you didn't want. This is an instance of just such a property. When the dust has settled, I'll do a more thorough breakdown of the pieces of code which made all of this possible.
 
 If anything, this is a reminder that the Ethereum developers can work hard to do everything right - include up-to-date best security practices, and still get burned.
 
 Never invest more than you are willing to lose.
-
-**This will serve as a live document for now, it's likely that more information will come out in drips, and as I investigate myself I hope to write a full report on what happened with concrete code and transactional evidence, which I will release on my [twitter](https://twitter.com/aftermathdigit). Likewise if you think there's an error here, please reach out to me on twitter. Until then, stay safe!**
-
