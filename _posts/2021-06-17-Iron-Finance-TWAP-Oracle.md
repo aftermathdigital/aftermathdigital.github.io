@@ -72,7 +72,7 @@ At this point in time, I believe someone (most likely multiple people) abused th
 
 ## Conclusion
 
-In computer-science, there's very rarely a free lunch. Algorithmic changes which give you certain properties you want often give you other properties you hadn't anticipated, which you didn't want. This is an instance of just such property.
+In computer-science, there's very rarely a free lunch. Algorithmic changes which give you certain properties you want often give you other properties you hadn't anticipated, which you didn't want. This is an instance of just such a property.
 
 If anything, this is a reminder that the Ethereum developers can work hard to do everything right - include up-to-date best security practices, and still get burned.
 
