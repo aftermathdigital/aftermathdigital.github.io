@@ -8,7 +8,7 @@ categories:     exploit
 
 If you're reading this blog, you've probably heard of flash-loan attacks. If not, here's an example of one in action.
 
- **tldr**; a flash loan allows a contract to make a totally uncollateralized loan as long as that loan is paid back with interest in the same transaction - relaxing the rules on collateral enables flash loans to be truly massive. These massive loans are then use to manipulate prices which enable further economic exploitation.
+ **tldr**; a flash loan allows a contract to make a totally uncollateralized loan as long as that loan is paid back with a fee in the same transaction - relaxing the rules on collateral enables flash loans to be truly massive. These massive loans are then use to manipulate prices which enable further economic exploitation.
 
 Iron-Finance was recently exploited in such a way that their [TITAN](https://www.coingecko.com/en/coins/iron-titanium-token) token went to zero in a matter of hours. I believe the exploit took advantage of a **mitigation** which was put in place to prevent flash-loan attacks, a Time-Weighted-Average-Price (**TWAP**) oracle.
 
