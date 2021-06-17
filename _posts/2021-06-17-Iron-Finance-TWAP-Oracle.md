@@ -56,7 +56,7 @@ As anyone who's been in DeFi for a little bit of time will tell you, massive pri
 
 Lets imagine that there **has** been a massive price swing - the value of some token has been reduced by twenty percent over the space of a two or three blocks, and lets imagine our smart contract uses ten prices (N = 10), at a recording interval of five blocks. *(The price values here are arbitrary units).*
 
-Going back to our previous example, the array which is being used to record the previous pricing data might look like the following:
+Going back to our previous example, the array which is being used to record the previous pricing data might look like the following *(note this is a naive example of a TWAP, just to illustrate the concept. Real TWAPs are more complicated)*:
 
 ![price_points](/images/twap_price_points.png)
 
