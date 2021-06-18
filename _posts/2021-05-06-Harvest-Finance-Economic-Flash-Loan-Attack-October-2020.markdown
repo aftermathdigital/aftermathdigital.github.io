@@ -11,7 +11,7 @@ The exploiting contract syphoned approximately 11 million dollars-worth of stabl
 
 In this post, we're going to look at the underlying implementation of the vault, and explore what it was that made this attack possible.
 
-### Notable Contracts
+### Notable Contracts and Transactions
 
 - Exploiting Transaction: [0x35f8d2f572fceaac9288e5d462117850ef2694786992a8c3f6d02612277b0877](https://etherscan.io/tx/0x35f8d2f572fceaac9288e5d462117850ef2694786992a8c3f6d02612277b0877)
 - VaultProxy (fUSDC): [0xf0358e8c3CD5Fa238a29301d0bEa3D63A17bEdBE](https://etherscan.io/address/0xf0358e8c3cd5fa238a29301d0bea3d63a17bedbe)
