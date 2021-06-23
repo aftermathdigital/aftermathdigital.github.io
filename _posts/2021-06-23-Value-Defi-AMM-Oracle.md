@@ -6,7 +6,7 @@ summary:	A deep-dive into the vulnerable oracle implementation which lost Value 
 categories:	exploit
 ---
 
-In November 2020, Value DeFi was exploited and saw 8.9 million 3Crv drained from its MultiStableVault, which was sold for 7.4 million DAI. As is often the case with multi-stable-vault exploitation, it was an unprotected pricing oracle which was vulnerable to a flash-loan attack which enabled the exploiters to perform their digital heist.
+In November 2020, Value DeFi was exploited and saw 8.9 million 3Crv drained from its MultiStablesVault, which was sold for 7.4 million DAI. As is often the case with multi-stable-vault exploitation, it was an unprotected pricing oracle which was vulnerable to a flash-loan attack which enabled the exploiters to perform their digital heist.
 
 In a manner very similar to the [Harvest-Finance](https://aftermath.digital/exploit/2021/05/06/Harvest-Finance-Economic-Flash-Loan-Attack-October-2020/) flash-loan attack of October 2020, the vault contract was tricked into overvaluing the vault LP token's value with respect to a curve token - [3Crv](https://etherscan.io/address/0x6c3F90f043a72FA612cbac8115EE7e52BDe6E490) in this case.
 
