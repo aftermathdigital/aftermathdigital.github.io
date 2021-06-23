@@ -341,7 +341,7 @@ This for loop is iterating over all of the tokens the `MultiVaultController` con
 In the line marked `[0]`, the contract is checking how much each of the tokens it owns is worth when converted to the token the attacker is trying to withdraw, as below:
 
 ```c
-// MultiStablesVaultController: [0xba5D28F4ECEE5586D616024c74E4d791E01aDEE7]    
+// ShareConverter: [0x57CDa125d0c7b146A8320614ccd6c55999d15BF2] 
 function convert_shares_rate(
     address _input,
     address _output,
