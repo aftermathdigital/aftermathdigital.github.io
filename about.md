@@ -15,4 +15,4 @@ I'll be looking at the high-level exploit, and breaking it down at the source or
 
 I'll also be considering some of the patterns which have been developed to protect smart-contracts from exploitation or manipulation, highlighting their drawbacks, and how they might be misused.
 
-Follow me for updates on [twitter](https://twitter.com/aftermathdigit)
+If you like the sound of that, you could follow me on [twitter](https://twitter.com/aftermathdigit).
