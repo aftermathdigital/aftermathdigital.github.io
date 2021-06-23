@@ -56,7 +56,7 @@ function deposit(
 }
 ```
 
-The `_input` parameter was the [DAI stablecoin](https://etherscan.io/token/0x6b175474e89094c44da98b954eedeac495271d0f) contract, and the `_vault` parameter passed to deposit was the [MultiStablesVault](https://etherscan.io/address/0xddd7df28b1fb668b77860b473af819b03db61101), who's deposit method, called at `//[0]`, looks like the following:
+The `_input` parameter was the [DAI stablecoin](https://etherscan.io/token/0x6b175474e89094c44da98b954eedeac495271d0f) contract, and the `_vault` parameter passed to deposit was the [MultiStablesVault](https://etherscan.io/address/0xddd7df28b1fb668b77860b473af819b03db61101), who's deposit function `[0]`, looks like the following:
 
 ```c
 //MultiStablesVault: [0xDdD7df28B1Fb668B77860B473aF819b03DB61101]
@@ -99,9 +99,9 @@ function depositFor(
     }
 ```
 
-In this case `address(basedToken)` and `_ctrlWant` are both [3Crv](https://etherscan.io/address/0x6c3f90f043a72fa612cbac8115ee7e52bde6e490), which isn't the input token specified by the attacker (which was DAI). This takes us to the `else` branch at `//[0]`. Looking at `input2Want`, we see that when called with DAI as the input, the `_want` address is null - which results in`_want` being set to `_ctrlWant` (3Crv) after-all.
+In this case `address(basedToken)` and `_ctrlWant` are both [3Crv](https://etherscan.io/address/0x6c3f90f043a72fa612cbac8115ee7e52bde6e490), which isn't the input token specified by the attacker (which was DAI). This takes us to the `else` branch at `[0]`. Looking at `input2Want`, we see that when called with DAI as the input, the `_want` address is null - which results in`_want` being set to `_ctrlWant` (3Crv) after-all.
 
-And so, after a roundabout trip, we end up at the line `IMultiVaultConverter _converter = converters[_want];`, at `//[1]` with `_want` set to the address of the 3Crv token, which resolves a MultiVaultConverter for the 3Crv token. The purpose of this converter is to exchange the attacker's DAI for 3Crv. `converters[_want]` resolves to the address [0x8c2F33B3a580BAeb2A1F2D34bCC76E020a54338d](https://etherscan.io/address/0x8c2F33B3a580BAeb2A1F2D34bCC76E020a54338d), which is the StableSwap3PoolConverter. And the `convert` function called at `//[2]` is the following:
+And so, after a roundabout trip, we end up at the line `IMultiVaultConverter _converter = converters[_want];`, at `[1]` with `_want` set to the address of the 3Crv token, which resolves a MultiVaultConverter for the 3Crv token. The purpose of this converter is to exchange the attacker's DAI for 3Crv. `converters[_want]` resolves to the address [0x8c2F33B3a580BAeb2A1F2D34bCC76E020a54338d](https://etherscan.io/address/0x8c2F33B3a580BAeb2A1F2D34bCC76E020a54338d), which is the StableSwap3PoolConverter. And the `convert` function called at `[2] `is the following:
 
 ```c
 //StableSwap3PoolConverter: [0x8c2F33B3a580BAeb2A1F2D34bCC76E020a54338d]
@@ -135,14 +135,14 @@ function convert(
 This is a big function, so I've omitted the lines which concern tokens other than 3Crv, since that's what we're interested in.
 
 - The for loop is iterating over the native tokens supported by the Curve's stableSwap3Pool, which are DAI, USDC, and USDT respectively.
-  - Given DAI is at index zero, the first iteration of the loop will result in the DAI the attacker deposited in Value DeFi's MultiStableVault being deposited into [Curve's pool](https://etherscan.io/address/0xbebc44782c7db0a1a60cb6fe97d0b483032ff1c7) via the `stableSwap3Pool.add_liquidity(amounts, 1);` at `//[0]`.
+  - Given DAI is at index zero, the first iteration of the loop will result in the DAI the attacker deposited in Value DeFi's MultiStableVault being deposited into [Curve's pool](https://etherscan.io/address/0xbebc44782c7db0a1a60cb6fe97d0b483032ff1c7) via the `stableSwap3Pool.add_liquidity(amounts, 1);` at `[0]`.
   - The [stableSwap3Pool](https://etherscan.io/address/0xbebc44782c7db0a1a60cb6fe97d0b483032ff1c7) `add_liquidity` function is responsible for exchanging an asset for 3Crv.
   - Getting into the weeds of 3Crv is beyond the scope of this post, but you can see how the function works [here](https://etherscan.io/address/0xbebc44782c7db0a1a60cb6fe97d0b483032ff1c7#code); suffice to say DAI is deposited, and 3Crv (the pool's LP token) is returned at the rate deemed appropriate by Curve's algorithm.
 
 - This iteration of the for loop ends in `return _outputAmount`, which lets the caller know how many 3Crv tokens the DAI was exchanged for.
   - Interestingly, the caller seems to ignore the return value and calculate the amount of tokens returned by checking the contract balance before and after the call to `convert`.
 
-Returning to `depositFor`, the next step is to take these new 3Crv tokens, and deposit them in the `MultiStablesVault` using the `_deposit` function at `//[3]`:
+Returning to `depositFor` (the figure previous to the one above), the next step is to take these new 3Crv tokens, and deposit them in the `MultiStablesVault` using the `_deposit` function at `[3]`:
 
 ```c
 //MultiStablesVault: [0xDdD7df28B1Fb668B77860B473aF819b03DB61101]
@@ -182,14 +182,14 @@ function _deposit(
 This function is fairly simple.
 
 - There's an insurance fee taken, which we can ignore.
-- There's Some logic to determine how many 'shares' (LP Tokens) should be minted in exchange for the 3Crv tokens received in exchange for the attacker's deposited DAI.
-- `_want` and `basedToken` are both 3Crv, so we fall straight through to the calculation for `_shares` at `//[0]`:
+- There's some logic to determine how many 'shares' (LP Tokens) should be minted in exchange for the 3Crv tokens received in exchange for the attacker's deposited DAI.
+- `_want` and `basedToken` are both 3Crv, so we fall straight through to the calculation for `_shares` at `[0]`:
   - `_shares = (_amount.mul(totalSupply())).div(_pool);`
   - This is the usual calculation to determine the value of a single 3Crv in pool LP, multiplied by the `_amount` of 3Crv being deposited.
 
 - Finally, if `_shares` is greater than 0:
-  - The `_earn` function at `//[1]` puts this new 3Crv to work, as we'll see below.
-  - The contract mints the attacker their share of the pool, given their initial DAI deposit at `//[2]`.
+  - The `_earn` function at `[1]` puts this new 3Crv to work, as we'll see below.
+  - The contract mints the attacker their share of the pool, given their initial DAI deposit at `[2]`.
 
 ```c
 //MultiStablesVault: [0xDdD7df28B1Fb668B77860B473aF819b03DB61101]
@@ -209,7 +209,7 @@ function earn(address _want) public override {
 
 This contract (MultiStablesVault) is not the contract which invests the 3Crv in a strategy to farm yield - it's done by a [controller](https://etherscan.io/address/0xba5d28f4ecee5586d616024c74e4d791e01adee7) contract. We'll re-visit this controller contract later, as its role in this exploit is significant.
 
-We can see the 3Crv tokens transferred from this contract to the [MultiStablesVaultController](https://etherscan.io/address/0xba5d28f4ecee5586d616024c74e4d791e01adee7) at `//[0]`.
+We can see the 3Crv tokens transferred from this contract to the [MultiStablesVaultController](https://etherscan.io/address/0xba5d28f4ecee5586d616024c74e4d791e01adee7) at `[0]`.
 
 That concludes the deposit workflow for this contract: DAI is deposited, that DAI is added as liquidity to Curve's StableSwap3Pool in exchange for 3Crv, some amount of MultiStablesVault LP is minted and sent to the user in exchange for that 3Crv, and the 3Crv itself is sent to the controller contract to earn yield.
 
@@ -246,7 +246,7 @@ Similar to the `deposit` function, the `withdraw` function requires the address 
 
 There's a condition that will automatically un-stake some tokens to ensure the user has enough idle LP to make the withdrawal, if they don't have enough idle LP already.
 
-The LP is optimistically transferred from the attacker and the vault's `withdrawFor` method is called at `//[0]`:
+The LP is optimistically transferred from the attacker and the vault's `withdrawFor` method is called at `[0]`:
 
 ```c
 //MultiStablesVault: [0xDdD7df28B1Fb668B77860B473aF819b03DB61101]
@@ -300,7 +300,7 @@ function withdrawFor(
 }
 ```
 
-`_output_amount` is calculated from three values, `balance_to_sell()`, `_shares`, and `totalSupply` at `//[0]`. If the attacker can maximise one of the multipliers, or minimize the divisor, then the `_output_amount` goes up. As you've probably guessed, the attacker can indeed manipulate one of these values in such a way...
+`_output_amount` is calculated from three values, `balance_to_sell()`, `_shares`, and `totalSupply` at `[0]`. If the attacker can maximise one of the multipliers, or minimize the divisor, then the `_output_amount` goes up. As you've probably guessed, the attacker can indeed manipulate one of these values in such a way...
 
 ```c
 //MultiStablesVault: [0xDdD7df28B1Fb668B77860B473aF819b03DB61101]
@@ -338,7 +338,7 @@ function balanceOf(address _want, bool _sell) external view returns (uint _total
 
 This for loop is iterating over all of the tokens the `MultiVaultController` contract has ownership over (its `_want` tokens).
 
-In the line marked `//[0]`, the contract is checking how much each of the tokens it owns is worth when converted to the token the attacker is trying to withdraw, as below:
+In the line marked `[0]`, the contract is checking how much each of the tokens it owns is worth when converted to the token the attacker is trying to withdraw, as below:
 
 ```c
 // MultiStablesVaultController: [0xba5D28F4ECEE5586D616024c74E4d791E01aDEE7]    
@@ -443,8 +443,8 @@ function withdraw(address _want, uint _amount) external returns (uint _withdrawF
 ```
 
 - The for loop is iterating over all the strategies that use the `_want` token as their native token.
-  - It withdraws `_want` from a strategy at `//[0]`.
-  - It decrements the amount of `_want` it needs to get from other strategies at `//[1]`.
+  - It withdraws `_want` from a strategy at `[0]`.
+  - It decrements the amount of `_want` it needs to get from other strategies at `[1]`.
 - Before the attacker deposited their DAI for LP, the quantity of 3Crv in these strategies was 8.9 million 3Crv.
 - By depositing 25 million DAI, an additional 24.95 million 3Crv was added to that balance.
 - That leaves approximately 34 million 3Crv tokens in this vault - so the attacker is able to drain that many tokens before being exposed to the slippage that would be experienced from actually trading other Crv tokens for 3Crv - which is what they did.
